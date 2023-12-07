@@ -1694,7 +1694,7 @@ class Ideal_pid(Ideal_principal):
             return ZZ.residue_field(self, check=False)
         raise NotImplementedError("residue_field() is only implemented for ZZ and rings of integers of number fields.")
 
-class Ideal_fractional(Ideal_generic):
+class Ideal_fractional(MonoidElement):
     """
     Fractional ideal of a ring.
 
