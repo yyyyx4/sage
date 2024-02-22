@@ -38,7 +38,7 @@ from sage.arith.misc import GCD as gcd
 import sage.misc.misc as misc
 from sage.rings.finite_rings.finite_field_constructor import FiniteField
 
-from sage.rings.ideal import Ideal_generic, Ideal_fractional
+from sage.rings.ideal import Ideal_fractional
 from sage.misc.misc_c import prod
 from sage.misc.mrange import xmrange_iter
 from sage.misc.cachefunc import cached_method
@@ -52,9 +52,9 @@ QQ = rational_field.RationalField()
 ZZ = integer_ring.IntegerRing()
 
 
-class NumberFieldIdeal(Ideal_generic):
+class NumberFieldIdeal(Ideal_fractional):
     """
-    An ideal of a number field.
+    A fractional ideal of a number field.
 
     EXAMPLES::
 
@@ -135,7 +135,7 @@ class NumberFieldIdeal(Ideal_generic):
                 gens = [field(gens, check=False)]
         if len(gens) == 0:
             raise ValueError("gens must have length at least 1 (zero ideal is not a fractional ideal)")
-        Ideal_generic.__init__(self, field, gens, coerce)
+        Ideal_fractional.__init__(self, field, gens, coerce)
         if field.absolute_degree() == 2:
             self.quadratic_form = self._quadratic_form
 
@@ -2015,7 +2015,7 @@ class NumberFieldFractionalIdeal(MultiplicativeGroupElement, NumberFieldIdeal, I
         nf = self.number_field().pari_nf()
         hnf = nf.idealdiv(self.number_field().ideal(1).pari_hnf(),
                           self.pari_hnf())
-        I = self.number_field().ideal(NumberFieldIdeal._NumberFieldIdeal__elements_from_hnf(self,hnf))
+        I = self.number_field().fractional_ideal(NumberFieldIdeal._NumberFieldIdeal__elements_from_hnf(self,hnf))
         I.__pari_hnf = hnf
         return I
 

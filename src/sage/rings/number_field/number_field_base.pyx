@@ -373,6 +373,19 @@ cdef class NumberField(Field):
             return Integer(1)
         return ans
 
+    def fractional_ideal_set(self):
+        r"""
+        Return the set of fractional ideals in this number field.
+
+        EXAMPLES::
+
+            sage: K = QuadraticField(-7)
+            sage: K.fractional_ideal_set()
+            Set of fractional ideals in Number Field in a with defining polynomial x^2 + 7 with a = 2.645751311064591?*I
+        """
+        from sage.rings.ideal_monoid import FractionalIdealSet
+        return FractionalIdealSet(self)
+
     # Approximate embeddings for comparisons with respect to the order of RR or
     # CC
 
