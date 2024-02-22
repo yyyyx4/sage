@@ -1336,9 +1336,22 @@ class QuaternionAlgebra_ab(QuaternionAlgebra_abstract):
         """
         return QuaternionOrder(self, basis, check=check)
 
-    def ideal(self, gens, left_order=None, right_order=None, check=True, **kwds):
+    def fractional_ideal_set(self):
         r"""
-        Return the quaternion ideal with given gens over `\ZZ`.
+        Return the set of fractional ideals of this quaternion algebra.
+
+        EXAMPLES::
+
+            sage: B = QuaternionAlgebra(-1, -11)
+            sage: B.fractional_ideal_set()
+            Set of fractional ideals in Quaternion Algebra (-1, -11) with base ring Rational Field
+        """
+        from sage.rings.ideal_monoid import FractionalIdealSet
+        return FractionalIdealSet(self)
+
+    def fractional_ideal(self, gens, left_order=None, right_order=None, check=True, **kwds):
+        r"""
+        Return the quaternion fractional ideal with given gens over `\ZZ`.
 
         Neither a left or right order structure need be specified.
 
@@ -1363,6 +1376,8 @@ class QuaternionAlgebra_ab(QuaternionAlgebra_abstract):
             return QuaternionFractionalIdeal_rational(self, gens, left_order=left_order, right_order=right_order, check=check)
         else:
             raise NotImplementedError("ideal only implemented for quaternion algebras over QQ")
+
+    ideal = fractional_ideal
 
     @cached_method
     def modp_splitting_data(self, p):
@@ -2809,20 +2824,6 @@ class QuaternionFractionalIdeal_rational(QuaternionFractionalIdeal):
         if self.__right_order is None:
             self.__right_order = self._compute_order(side='right')
         return self.__right_order
-
-    def __repr__(self):
-        """
-        Return string representation of this quaternion fractional ideal.
-
-        EXAMPLES::
-
-            sage: I = BrandtModule(11).right_ideals()[1]
-            sage: type(I)
-            <class 'sage.algebras.quatalg.quaternion_algebra.QuaternionFractionalIdeal_rational'>
-            sage: I.__repr__()
-            'Fractional ideal (8, 8*i, 6 + 4*i + 2*j, 4 + 2*i + 2*k)'
-        """
-        return 'Fractional ideal %s' % (self.gens(),)
 
     def random_element(self, *args, **kwds):
         """

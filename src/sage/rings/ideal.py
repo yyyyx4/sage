@@ -31,7 +31,7 @@ from types import GeneratorType
 
 from sage.categories.rings import Rings
 from sage.categories.fields import Fields
-from sage.structure.element import MonoidElement
+from sage.structure.element import Element, MonoidElement
 from sage.structure.richcmp import rich_to_bool, richcmp
 from sage.structure.sequence import Sequence
 
@@ -275,12 +275,12 @@ class Ideal_generic(MonoidElement):
         """
         self.__ring = ring
         if not isinstance(gens, (list, tuple)):
-            gens = [gens]
+            gens = (gens,)
         if coerce:
-            gens = [ring(x) for x in gens]
+            gens = (ring(x) for x in gens)
 
         gens = tuple(gens)
-        if len(gens) == 0:
+        if not gens:
             gens = (ring.zero(),)
         self.__gens = gens
         MonoidElement.__init__(self, ring.ideal_monoid())
@@ -1219,7 +1219,7 @@ class Ideal_generic(MonoidElement):
         R = self.ring()
         macaulay2.use(R._macaulay2_(macaulay2))
         gens = [repr(x) for x in self.gens()]
-        if len(gens) == 0:
+        if not gens:
             gens = ['0']
         return macaulay2.ideal(gens)
 
@@ -1694,12 +1694,43 @@ class Ideal_pid(Ideal_principal):
             return ZZ.residue_field(self, check=False)
         raise NotImplementedError("residue_field() is only implemented for ZZ and rings of integers of number fields.")
 
-class Ideal_fractional(MonoidElement):
+class Ideal_fractional(Element):
     """
     Fractional ideal of a ring.
-
-    See :func:`Ideal()`.
     """
+    def __init__(self, ring, gens, coerce=True, **kwds):
+        """
+        Initialize this fractional ideal.
+
+        INPUT:
+
+        - ``ring`` -- A ring
+
+        - ``gens`` -- The generators for this fractional ideal
+
+        - ``coerce`` -- (default: ``True``)
+          If ``gens`` needs to be coerced into ``ring``.
+
+        EXAMPLES::
+
+            sage: K.<a> = NumberField(x^2 + 1)                                          # needs sage.rings.number_field
+            sage: Ideal_fractional(K, [a])  # indirect doctest                          # needs sage.rings.number_field
+            Fractional ideal (a) of Number Field in a with defining polynomial x^2 + 1
+        """
+        self.__ring = ring
+        if not isinstance(gens, (list, tuple)):
+            gens = (gens,)
+        if coerce:
+            gens = (ring(x) for x in gens)
+
+        gens = tuple(gens)
+        if not gens:
+            gens = (ring.zero(),)
+        self.__gens = gens
+        Element.__init__(self, ring.fractional_ideal_set())
+
+    _repr_short = Ideal_generic._repr_short
+
     def _repr_(self):
         """
         Return a string representation of ``self``.
@@ -1712,7 +1743,30 @@ class Ideal_fractional(MonoidElement):
             sage: Ideal_fractional(K, [a])  # indirect doctest                          # needs sage.rings.number_field
             Fractional ideal (a) of Number Field in a with defining polynomial x^2 + 1
         """
-        return "Fractional ideal %s of %s" % (self._repr_short(), self.ring())
+        return f"Fractional ideal {self._repr_short()}"
+
+    def ring(self):
+        r"""
+        Return the containing ring of this fractional ideal.
+
+        EXAMPLES::
+
+            sage: I = QuadraticField(-7).fractional_ideal(1)
+            sage: I.ring()
+            Number Field in a with defining polynomial x^2 + 7 with a = 2.645751311064591?*I
+        """
+        return self.__ring
+
+    def gens(self):
+        r"""
+        Return the generators of this fractional ideal.
+
+        EXAMPLES::
+
+            sage: QuaternionAlgebra(-11,-1).maximal_order().unit_ideal().gens()
+            (1/2 + 1/2*i, 1/2*j - 1/2*k, i, -k)
+        """
+        return self.__gens
 
 # constructors for standard (benchmark) ideals, written uppercase as
 # these are constructors
